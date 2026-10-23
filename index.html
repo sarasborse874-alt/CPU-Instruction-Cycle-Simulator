@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPU Cycle Lab | Interactive Simulator</title>
+<style>
+:root{--bg:#080d19;--panel:#101a2d;--panel2:#14223a;--line:#293b5d;--text:#f1f6ff;--muted:#9eafce;--cyan:#5cebd0;--blue:#80a9ff;--gold:#ffd27a;--red:#ff8294}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#172c4c 0,transparent 38%),radial-gradient(ellipse at 100% 15%,#153a3b 0,transparent 30%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;line-height:1.5}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.topbar{max-width:1240px;margin:auto;padding:22px 24px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #263652}
+.brand{display:flex;align-items:center;gap:12px}.brand-icon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#63eed2,#6ca3ff);color:#081522;font-size:22px;font-weight:900;box-shadow:0 8px 30px #5cebd022}.brand-name{font-weight:850;letter-spacing:.02em}.brand-sub{font-size:12px;color:var(--muted)}.pill{border:1px solid #35506e;border-radius:999px;padding:7px 12px;color:#c6d5ef;font-size:12px;white-space:nowrap}
+.hero{max-width:1240px;margin:auto;padding:36px 24px 28px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:850;letter-spacing:.17em;text-transform:uppercase}.hero h1{font-size:clamp(30px,4vw,48px);line-height:1.08;letter-spacing:-.04em;margin:10px 0 12px;max-width:720px}.hero h1 span{background:linear-gradient(90deg,var(--cyan),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{color:var(--muted);max-width:720px;margin:0;font-size:15px}.hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.hero-tags span{font-size:12px;border:1px solid #2b4260;background:#0d1729;border-radius:8px;padding:7px 10px;color:#cbd8f1}
+.wrap{max-width:1240px;margin:auto;padding:0 24px 46px}.dashboard{display:grid;grid-template-columns:310px minmax(0,1fr);gap:18px;align-items:start}.panel{background:linear-gradient(150deg,#121e33ee,#0d1627f2);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 48px #0002}.setup{padding:20px;position:sticky;top:16px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}.panel h2{font-size:15px;margin:0;letter-spacing:.01em}.small-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800}
+label{display:block;color:#b6c5df;font-size:12px;font-weight:650;margin:14px 0 6px}input,select,textarea{width:100%;border:1px solid #334969;background:#091323;color:var(--text);border-radius:10px;padding:10px 11px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #5cebd018}textarea{resize:vertical;min-height:108px;line-height:1.6;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.btn{border:1px solid transparent;border-radius:10px;padding:10px 13px;font-size:12px;font-weight:850;transition:transform .15s,filter .15s}.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}.btn-primary{background:linear-gradient(110deg,var(--cyan),#8cf2d9);color:#08221e}.btn-secondary{background:#1a2b47;border-color:#344c70;color:#edf4ff}.btn-danger{background:#351d2b;border-color:#653246;color:#ffd9df}.help{font-size:11px;color:var(--muted);margin-top:13px;line-height:1.65}.right{min-width:0}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}.metric{padding:15px 16px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(140deg,#14213a,#0f192b);min-width:0}.metric-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:11px}.metric-icon{color:var(--cyan);font-size:15px}.metric strong{display:block;font-size:24px;letter-spacing:-.03em;margin-top:7px;overflow-wrap:anywhere}.metric small{color:var(--muted);font-size:10px}
+.sim-panel{padding:20px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.status{display:inline-flex;align-items:center;gap:7px;border:1px solid #315f5a;background:#102d2a;color:var(--cyan);padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800}.dot{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor}
+.phases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.phase{position:relative;padding:14px;border-radius:13px;border:1px solid #293c5c;background:#0b1526;min-height:98px;transition:.2s}.phase .num{font-size:10px;letter-spacing:.12em;color:var(--muted);font-weight:850}.phase h3{font-size:14px;margin:7px 0 3px}.phase p{font-size:11px;color:var(--muted);margin:0}.phase.active{border-color:var(--cyan);background:linear-gradient(135deg,#123c38,#102537);box-shadow:0 0 0 1px #5cebd02a,0 8px 26px #5cebd010}.phase.active .num,.phase.active h3{color:var(--cyan)}.phase.done{border-color:#38645e}.phase.done .num{color:#76d9c6}
+.reg-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.reg{background:#0a1425;border:1px solid #263956;border-radius:12px;padding:12px;min-width:0}.reg label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 7px}.reg strong{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:17px;display:block;overflow-wrap:anywhere}.reg em{display:block;font-style:normal;font-size:10px;color:#6f83a6;margin-top:3px}
+.explain{margin:15px 0 0;padding:15px;border:1px solid #27564f;background:linear-gradient(100deg,#102d2a,#102033);border-radius:13px;min-height:91px}.explain-title{font-size:13px;color:var(--cyan);font-weight:850;margin-bottom:4px}.explain p{font-size:12px;color:#d2deef;margin:0}.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.controls .btn{padding:11px 14px}.controls .btn:disabled{opacity:.38;cursor:not-allowed;transform:none}
+.lower-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(230px,.8fr);gap:14px;margin-top:14px}.trace,.memory{padding:18px;min-width:0}.trace-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.trace-scroll{overflow:auto;max-height:280px}table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap}th{text-align:left;color:#8fa4c7;font-weight:800;text-transform:uppercase;font-size:9px;letter-spacing:.08em;padding:10px 8px;border-bottom:1px solid #2a3b58}td{padding:10px 8px;border-bottom:1px solid #1d2c45;color:#d8e4f8}tr.current{background:#14302f}tr.current td:first-child{color:var(--cyan)}.empty{color:var(--muted);padding:18px 8px;font-size:12px}.memory-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.mem{border:1px solid #293b58;background:#0a1425;border-radius:10px;padding:11px}.mem small{font-size:10px;color:var(--muted);display:block}.mem strong{font-family:ui-monospace,monospace;font-size:18px}.mem.active{border-color:var(--gold);background:#302819}.mem.active strong{color:var(--gold)}.memory-note{color:var(--muted);font-size:10px;margin-top:12px;line-height:1.6}
+.footer{max-width:1240px;margin:auto;padding:0 24px 26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#6f82a3;font-size:10px}
+.toast{font-size:11px;color:var(--red);margin-top:9px;min-height:16px}
+@media(max-width:900px){.dashboard{grid-template-columns:1fr}.setup{position:static}.lower-grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.topbar{padding:16px}.hero{padding:28px 16px 22px}.wrap{padding:0 12px 30px}.topbar .pill{display:none}.phases{grid-template-columns:1fr}.phase{min-height:auto}.reg-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sim-panel{padding:14px}.setup{padding:16px}.hero h1{font-size:34px}.footer{padding:0 14px 22px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="brand-icon">⌘</div><div><div class="brand-name">CPU CYCLE LAB</div><div class="brand-sub">Computer Organization & Architecture</div></div></div>
+  <div class="pill">SY CSE · CO5 MICRO PROJECT</div>
+</header>
+<section class="hero">
+  <div class="eyebrow">Interactive learning environment</div>
+  <h1>Inside the CPU: <span>Instruction Cycle</span></h1>
+  <p>Explore how a processor fetches, decodes, and executes instructions. Change the program, inspect registers, and step through a simplified CPU in real time.</p>
+  <div class="hero-tags"><span>● Step-by-step execution</span><span>⌁ Live register state</span><span>↗ Editable program</span><span>◷ Modeled timing</span></div>
+</section>
+<main class="wrap">
+  <div class="dashboard">
+    <aside class="panel setup">
+      <div class="panel-head"><h2>Simulation setup</h2><span class="small-label">INPUTS</span></div>
+      <label for="program">Starter program</label>
+      <select id="program"><option value="demo">Demo · Load, Add, Store</option><option value="math">Arithmetic · Load, Add, Sub</option><option value="custom">Custom program</option></select>
+      <label for="customProgram">Instructions <span style="color:#7389ad;font-weight:500">(one per line)</span></label>
+      <textarea id="customProgram" spellcheck="false">LOAD R1, 5
+ADD R1, 3
+STORE R1, 104
+HALT</textarea>
+      <div class="field-row">
+        <div><label for="startPC">Starting PC</label><input id="startPC" type="number" min="0" max="9999" value="100"></div>
+        <div><label for="clock">Clock period (ns)</label><input id="clock" type="number" min="1" max="1000" value="2"></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-primary" id="startBtn">▶ Apply settings</button><button class="btn btn-secondary" id="resetBtn">↻ Reset</button></div>
+      <div id="error" class="toast" aria-live="polite"></div>
+      <p class="help"><b>Supported instructions</b><br>LOAD R1, number · ADD R1, number · SUB R1, number · STORE R1, address · HALT<br><br>Tip: start with the demo, then edit the numbers to test your own program.</p>
+    </aside>
+    <section class="right">
+      <div class="metrics">
+        <div class="metric"><div class="metric-top">Current phase <span class="metric-icon">◉</span></div><strong id="phaseStat">Ready</strong><small>Instruction state</small></div>
+        <div class="metric"><div class="metric-top">Micro-steps <span class="metric-icon">↯</span></div><strong id="stepsStat">0</strong><small>Modeled operations</small></div>
+        <div class="metric"><div class="metric-top">Instructions <span class="metric-icon">▤</span></div><strong id="doneStat">0</strong><small>Completed so far</small></div>
+        <div class="metric"><div class="metric-top">Elapsed time <span class="metric-icon">◷</span></div><strong id="timeStat">0 ns</strong><small>Illustrative estimate</small></div>
+      </div>
+      <div class="panel sim-panel">
+        <div class="section-title"><h2>Processor control room</h2><span class="status"><span class="dot"></span><span id="statusTag">READY</span></span></div>
+        <div class="phases">
+          <div class="phase" id="fetchPhase"><div class="num">PHASE 01</div><h3>↓ Fetch</h3><p>Read instruction from memory</p></div>
+          <div class="phase" id="decodePhase"><div class="num">PHASE 02</div><h3>⌕ Decode</h3><p>Interpret opcode and operand</p></div>
+          <div class="phase" id="executePhase"><div class="num">PHASE 03</div><h3>⚡ Execute</h3><p>Perform the operation</p></div>
+        </div>
+        <div class="reg-grid">
+          <div class="reg"><label>Program Counter · PC</label><strong id="pcVal">100</strong><em>Next instruction address</em></div>
+          <div class="reg"><label>Instruction Register · IR</label><strong id="irVal">—</strong><em>Current instruction</em></div>
+          <div class="reg"><label>General Register · R1</label><strong id="r1Val">0</strong><em>Working value</em></div>
+          <div class="reg"><label>Memory Address · MAR</label><strong id="marVal">—</strong><em>Address being accessed</em></div>
+          <div class="reg"><label>Memory Data · MDR</label><strong id="mdrVal">—</strong><em>Data being transferred</em></div>
+          <div class="reg"><label>Clock period</label><strong id="clockVal">2 ns</strong><em>Editable simulation parameter</em></div>
+        </div>
+        <div class="explain" aria-live="polite"><div class="explain-title" id="stepTitle">Ready to begin</div><p id="stepText">Apply a program, then click Next Micro-step to observe each stage of the instruction cycle.</p></div>
+        <div class="controls">
+          <button class="btn btn-primary" id="nextBtn" disabled>Next micro-step →</button>
+          <button class="btn btn-secondary" id="instructionBtn" disabled>Run next instruction</button>
+          <button class="btn btn-secondary" id="runBtn" disabled>▶ Run all</button>
+          <button class="btn btn-danger" id="pauseBtn" disabled>Ⅱ Pause</button>
+        </div>
+      </div>
+      <div class="lower-grid">
+        <div class="panel trace"><div class="trace-head"><h2>Execution trace</h2><span class="small-label">OUTPUT LOG</span></div><div class="trace-scroll"><table><thead><tr><th>#</th><th>Address</th><th>Instruction</th><th>Decode</th><th>Result</th></tr></thead><tbody id="traceBody"><tr><td colspan="5" class="empty">Execution steps will appear here.</td></tr></tbody></table></div></div>
+        <div class="panel memory"><div class="trace-head"><h2>Data memory</h2><span class="small-label">SAMPLE</span></div><div class="memory-grid" id="memoryGrid"></div><div class="memory-note">Highlighted memory cells indicate the location accessed by the current operation. STORE writes R1 into the selected address.</div></div>
+      </div>
+    </section>
+  </div>
+</main>
+<footer><span>CPU Cycle Lab · Educational simulator</span><span>HTML · CSS · JavaScript · No external libraries</span></footer>
+<script>
+const $=id=>document.getElementById(id);
+const programs={demo:["LOAD R1, 5","ADD R1, 3","STORE R1, 104","HALT"],math:["LOAD R1, 12","ADD R1, 7","SUB R1, 4","HALT"]};
+let cpu=null,timer=null;
+function stopAuto(){if(timer){clearInterval(timer);timer=null} $("pauseBtn").disabled=true}
+function parseProgram(){
+ const mode=$("program").value;
+ const raw=mode==="demo"?programs.demo:mode==="math"?programs.math:$("customProgram").value.split(/\n/).map(s=>s.trim()).filter(Boolean);
+ const ins=raw.map(s=>s.trim().toUpperCase()).filter(Boolean);
+ const valid=/^(LOAD R1, -?\d+|ADD R1, -?\d+|SUB R1, -?\d+|STORE R1, \d+|HALT)$/;
+ if(!ins.length)throw Error("Please enter at least one instruction.");
+ const bad=ins.find(s=>!valid.test(s));
+ if(bad)throw Error('Unsupported instruction: "'+bad+'". Check the format and try again.');
+ if(!ins.includes("HALT"))ins.push("HALT");
+ return ins;
+}
+function init(){
+ stopAuto();$("error").textContent="";
+ try{
+  const instructions=parseProgram(),pc=Math.max(0,Number($("startPC").value)||0),clock=Math.max(1,Number($("clock").value)||1);
+  cpu={instructions,basePC:pc,pc,r1:0,ir:"—",mar:"—",mdr:"—",clock,phase:0,index:0,steps:0,completed:0,halted:false,trace:[],memory:{100:12,101:7,102:0,104:0},status:"Ready",lastAddress:null};
+  $("stepTitle").textContent="Simulation initialized";
+  $("stepText").textContent="The program is loaded into modeled instruction memory starting at address "+pc+". Click Next micro-step to begin fetching.";
+  render();
+ }catch(e){$("error").textContent=e.message}
+}
+function step(){
+ if(!cpu||cpu.halted)return;
+ const instr=cpu.instructions[cpu.index];
+ if(!instr){cpu.halted=true;cpu.status="Halted";render();return}
+ const address=cpu.basePC+cpu.index;cpu.lastAddress=address;
+ if(cpu.phase===0){
+  cpu.mar=address;cpu.mdr=instr;cpu.ir=instr;cpu.phase=1;cpu.steps++;cpu.status="Fetching";
+  $("stepTitle").textContent="FETCH · Instruction loaded";
+  $("stepText").textContent="MAR ← PC ("+address+"); MDR ← Memory["+address+"]; IR ← MDR. The instruction at address "+address+" is copied into the Instruction Register.";
+ }else if(cpu.phase===1){
+  cpu.phase=2;cpu.steps++;cpu.status="Decoding";const op=instr.split(/[ ,]+/)[0];
+  $("stepTitle").textContent="DECODE · "+op+" identified";
+  $("stepText").textContent='The control unit interprets "'+instr+'", identifies the operation and operand, and prepares the required action.';
+ }else{
+  const p=instr.split(/[ ,]+/),op=p[0];let result="";
+  if(op==="LOAD"){cpu.r1=Number(p[2]);result="R1 ← "+cpu.r1}
+  else if(op==="ADD"){cpu.r1+=Number(p[2]);result="R1 ← R1 + "+p[2]+" = "+cpu.r1}
+  else if(op==="SUB"){cpu.r1-=Number(p[2]);result="R1 ← R1 − "+p[2]+" = "+cpu.r1}
+  else if(op==="STORE"){cpu.memory[Number(p[2])]=cpu.r1;cpu.lastAddress=Number(p[2]);result="Memory["+p[2]+"] ← "+cpu.r1}
+  else if(op==="HALT"){result="HALT signal: processor stops.";cpu.halted=true}
+  cpu.steps++;cpu.completed++;cpu.trace.push({n:cpu.completed,address,instr,decode:op,result});
+  $("stepTitle").textContent="EXECUTE · "+op+" completed";
+  $("stepText").textContent=result+(cpu.halted?" The simulation has ended because HALT was executed.":" The instruction is complete; PC advances to the next instruction.");
+  cpu.index++;cpu.pc=cpu.basePC+cpu.index;cpu.phase=0;cpu.status=cpu.halted?"Halted":"Running";
+ }
+ render();
+}
+function runInstruction(){if(!cpu||cpu.halted)return;const n=cpu.completed;let guard=0;while(!cpu.halted&&cpu.completed===n&&guard++<4)step()}
+function runAll(){if(!cpu||cpu.halted)return;stopAuto();timer=setInterval(()=>{if(cpu.halted){stopAuto();return}step()},500);$("pauseBtn").disabled=false}
+function render(){
+ if(!cpu)return;
+ $("phaseStat").textContent=cpu.halted?"Halted":["Fetch","Decode","Execute"][cpu.phase];
+ $("stepsStat").textContent=cpu.steps;$("doneStat").textContent=cpu.completed;$("timeStat").textContent=(cpu.steps*cpu.clock)+" ns";
+ $("statusTag").textContent=cpu.status.toUpperCase();$("pcVal").textContent=cpu.pc;$("irVal").textContent=cpu.ir;$("r1Val").textContent=cpu.r1;$("marVal").textContent=cpu.mar;$("mdrVal").textContent=cpu.mdr;$("clockVal").textContent=cpu.clock+" ns";
+ ["fetchPhase","decodePhase","executePhase"].forEach((id,i)=>{$(id).className="phase"+(!cpu.halted&&cpu.phase===i?" active":i<cpu.phase?" done":"")});
+ $("nextBtn").disabled=cpu.halted;$("instructionBtn").disabled=cpu.halted;$("runBtn").disabled=cpu.halted;
+ $("traceBody").innerHTML=cpu.trace.length?cpu.trace.map((t,i)=>`<tr class="${i===cpu.trace.length-1?'current':''}"><td>${t.n}</td><td>${t.address}</td><td>${esc(t.instr)}</td><td>${esc(t.decode)}</td><td>${esc(t.result)}</td></tr>`).join(""):'<tr><td colspan="5" class="empty">Execution steps will appear here.</td></tr>';
+ const mem=Object.entries(cpu.memory).sort((a,b)=>Number(a[0])-Number(b[0]));
+ $("memoryGrid").innerHTML=mem.map(([a,v])=>`<div class="mem ${Number(a)===Number(cpu.lastAddress)&&cpu.status!=="Ready"?'active':''}"><small>Address ${a}</small><strong>${v}</strong></div>`).join("");
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+$("startBtn").addEventListener("click",init);$("resetBtn").addEventListener("click",init);
+$("nextBtn").addEventListener("click",()=>{stopAuto();step()});$("instructionBtn").addEventListener("click",()=>{stopAuto();runInstruction()});
+$("runBtn").addEventListener("click",runAll);$("pauseBtn").addEventListener("click",stopAuto);
+$("program").addEventListener("change",()=>{$("customProgram").value=$("program").value==="custom"?"LOAD R1, 5\nADD R1, 3\nSTORE R1, 104\nHALT":programs[$("program").value].join("\n")});
+init();
+</script>
+</body>
+</html>
